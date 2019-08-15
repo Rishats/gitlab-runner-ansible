@@ -1,0 +1,6 @@
+# file: servers.yml
+- hosts: servers
+  become: true
+  become_user: root
+  roles:
+    - ansible-gitlab-runner
