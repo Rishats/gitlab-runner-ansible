@@ -133,14 +133,87 @@ gitlab_runner_temp_dir: /tmp
 
 ```
 
-### Install
-1) git clone project.
-2) create file production in host_vars and paste data above.
-3) python3 -m venv env
-4) source env/bin/activate
-5) pip install -r requirements.txt
-6) ansible -i inventory/production servers -m ping
-7) ansible-playbook -i inventory site.yml
+### Install and run
+1) Git clone project.
+```shell
+git clone git@github.com:Rishats/gitlab-runner-ansible.git
+```
+
+2) Create file production.yml in host_vars folder and paste data below:
+```yaml
+---
+# Change this variable value to 'gitlab-runner' for versions >= 10.x
+gitlab_runner_package_version: '11.8.0'
+gitlab_runner_package_name: 'gitlab-runner'
+
+# Maximum number of global jobs to run concurrently
+gitlab_runner_concurrent: '{{ ansible_processor_vcpus }}'
+
+# GitLab coordinator URL
+gitlab_runner_coordinator_url: 'https://gitlab.example.com/ci'
+# GitLab registration token
+gitlab_runner_registration_token: 'token-admin-panel'
+
+gitlab_runner_sentry_dsn: ''
+
+# A list of runners to register and configure
+gitlab_runner_runners:
+    # The identifier of the runner.
+  - name: '{{ ansible_hostname }}'
+    # set to 'absent' if you want to delete the runner. Defaults to 'present'.
+    state: present
+    # The executor used by the runner.
+    executor: 'docker'
+    # Maximum number of jobs to run concurrently on this specific runner.
+    # Defaults to 0, simply means don't limit.
+    concurrent_specific: '1'
+    # The default Docker image to use. Required when executor is `docker`.
+    docker_image: 'php:7.3'
+    # The tags assigned to the runner.
+    tags: ['sonarqube']
+    # Indicates whether this runner can pick jobs without tags.
+    run_untagged: false
+    # Docker privileged mode
+    docker_privileged: false
+    # Runner Locked. When a runner is locked, it cannot be assigned to other projects
+    locked: 'true'
+    # Custom environment variables injected to registration command
+    env_vars: []
+gitlab_runner_temp_dir: /tmp
+```
+
+3) Install python 3.6.
+https://www.python.org/downloads/
+
+4) Install virtualenv for python.
+https://docs.python-guide.org/dev/virtualenvs/#lower-level-virtualenv
+
+5) Create virtualenv for python.
+```shell 
+python3 -m venv env
+```
+
+6) Use virtualenv
+```shell
+source env/bin/activate
+```
+
+7) Install requirements for Python via pip
+```shell
+pip install -r requirements.txt
+```
+
+8) Open file [production](inventory/production) and edit ansible_ssh_host=ansible_ssh_host with your IP.
+
+9) Run Check connection via Ansible for Appnode.
+```shell
+ansible -i inventory/production servers -m ping
+```
+
+10) Start playbook for Appnode via Ansible.
+```shell
+python3 $(which ansible-playbook) -i inventory site.yml
+```
 
 ### Securing your host variables
 Since you storing highly confidential information like production database passwords in the host variables and .env templates it is highly recommend that encrypt them with a symmetric AES key. Luckily Ansible has built-in tool for this called Vault. Please [read the Vault documentation](http://docs.ansible.com/ansible/playbooks_vault.html) on how to set it up.
