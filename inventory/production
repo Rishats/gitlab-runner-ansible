@@ -2,3 +2,6 @@
 
 [servers]
 production ansible_ssh_host=192.168.50.1 ansible_ssh_port=2211 ansible_ssh_user=vagrant ansible_python_interpreter=/usr/bin/python3
+
+[servers-docker]
+production ansible_ssh_host=192.168.50.1 ansible_ssh_port=2211 ansible_ssh_user=vagrant ansible_python_interpreter=/usr/bin/python3
