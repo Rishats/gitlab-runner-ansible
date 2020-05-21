@@ -131,6 +131,11 @@ gitlab_runner_runners:
 
 gitlab_runner_temp_dir: /tmp
 
+docker__edition: "ce"
+docker__channel: ["stable"]
+docker__version: ""
+docker__state: "present"
+docker__users: ["{{ ansible_env.SUDO_USER | d('root') }}"]
 ```
 
 ### Install and run
